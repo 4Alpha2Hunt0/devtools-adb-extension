@@ -1,0 +1,60 @@
+"use strict";
+const fs = require("fs");
+const path = require("path");
+
+const IMAGE_MEDIA_TYPES = {
+	".png": "image/png",
+	".jpg": "image/jpeg",
+	".jpeg": "image/jpeg",
+	".webp": "image/webp",
+	".gif": "image/gif",
+};
+
+const TEXT_EXTENSIONS = new Set([".md", ".txt", ".csv", ".json", ".log"]);
+
+async function extractPdfText(buffer) {
+	const pdfParse = require("pdf-parse");
+	const data = await pdfParse(buffer);
+	return data.text;
+}
+
+async function extractDocxText(buffer) {
+	const mammoth = require("mammoth");
+	const { value } = await mammoth.extractRawText({ buffer });
+	return value;
+}
+
+/** Reads `filePath` and returns either { kind: "text", text } or
+ * { kind: "image", imageBase64, mediaType }, ready to hand to classifyContent().
+ * `deps` lets tests inject fake PDF/DOCX parsers without needing real files. */
+async function extractContent(filePath, deps = {}) {
+	const readPdf = deps.extractPdfText || extractPdfText;
+	const readDocx = deps.extractDocxText || extractDocxText;
+	const ext = path.extname(filePath).toLowerCase();
+
+	if (IMAGE_MEDIA_TYPES[ext]) {
+		const buffer = fs.readFileSync(filePath);
+		return { kind: "image", imageBase64: buffer.toString("base64"), mediaType: IMAGE_MEDIA_TYPES[ext] };
+	}
+	if (ext === ".pdf") {
+		const buffer = fs.readFileSync(filePath);
+		return { kind: "text", text: await readPdf(buffer) };
+	}
+	if (ext === ".docx") {
+		const buffer = fs.readFileSync(filePath);
+		return { kind: "text", text: await readDocx(buffer) };
+	}
+	if (TEXT_EXTENSIONS.has(ext) || ext === "") {
+		return { kind: "text", text: fs.readFileSync(filePath, "utf8") };
+	}
+
+	// Unknown extension: only accept it if it decodes cleanly as UTF-8 text.
+	const buffer = fs.readFileSync(filePath);
+	const sample = buffer.subarray(0, 2000).toString("utf8");
+	if (sample.includes("�")) {
+		throw new Error(`Unsupported file type: ${ext || "(no extension)"}`);
+	}
+	return { kind: "text", text: buffer.toString("utf8") };
+}
+
+module.exports = { extractContent, extractPdfText, extractDocxText, IMAGE_MEDIA_TYPES, TEXT_EXTENSIONS };
