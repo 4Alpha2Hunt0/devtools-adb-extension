@@ -1,0 +1,22 @@
+{
+  "name": "obsidian-brain",
+  "version": "0.1.0",
+  "description": "Logs tool usage into linked daily notes and a tool reference database, and keeps a live tools dashboard.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "typecheck": "tsc -noEmit -skipLibCheck"
+  },
+  "keywords": [],
+  "author": "4Alpha2Hunt0",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.19.11",
+    "obsidian": "^1.4.11",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  }
+}
