@@ -161,7 +161,7 @@ async function refreshToolsDashboard(app: App, settings: ObsidianBrainSettings):
 			const fm = (app.metadataCache.getFileCache(f)?.frontmatter ?? {}) as ToolFrontmatter;
 			return {
 				name: f.basename,
-				path: f.path,
+				path: `${settings.toolsFolder}/${f.basename}`,
 				timesUsed: typeof fm.times_used === "number" ? fm.times_used : 0,
 				lastUsed: fm.last_used ?? "—",
 				tags: (fm.tags ?? []).filter((t) => t !== "tool").join(", ") || "—",
@@ -238,7 +238,7 @@ async function createToolReferenceNote(
 }
 
 class PromptModal extends Modal {
-	private onSubmit: (values: Record<string, string>) => void;
+	private onSubmit: (values: Record<string, string>) => void | Promise<void>;
 	private fields: { key: string; label: string; multiline?: boolean }[];
 	private values: Record<string, string> = {};
 
@@ -246,7 +246,7 @@ class PromptModal extends Modal {
 		app: App,
 		title: string,
 		fields: { key: string; label: string; multiline?: boolean }[],
-		onSubmit: (values: Record<string, string>) => void
+		onSubmit: (values: Record<string, string>) => void | Promise<void>
 	) {
 		super(app);
 		this.fields = fields;
@@ -276,9 +276,9 @@ class PromptModal extends Modal {
 			btn
 				.setButtonText("Submit")
 				.setCta()
-				.onClick(() => {
+				.onClick(async () => {
+					await this.onSubmit(this.values);
 					this.close();
-					this.onSubmit(this.values);
 				})
 		);
 	}
