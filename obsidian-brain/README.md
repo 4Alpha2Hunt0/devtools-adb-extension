@@ -11,6 +11,12 @@ and tool usage in one linked knowledge base.
   commands to log tool usage, catalog tools, create project notes, and
   refresh the tools dashboard. See `plugin/README.md` for build/install
   instructions.
+- **`inbox-watcher/`** — a standalone Node.js tool (no Obsidian API). Drop
+  any file (note, PDF, docx, image) into the vault's `Inbox/` folder and it
+  uses Claude to summarize/classify it, then files a note into
+  `Tools/`/`Projects/`/`Notes/` and archives the original into
+  `Attachments/`. Requires your own Anthropic API key. See
+  `inbox-watcher/README.md`.
 
 ## Getting started
 
