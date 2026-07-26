@@ -26,7 +26,7 @@ make package   # clean dist/, then build one .xpi + update.json per arch into di
 make clean     # remove dist/<arch>/ folders
 ```
 
-There is no lint/test suite for this half of the repo — it's packaging of vendored binaries, not application code.
+For each arch, `make package` generates a temporary `extension/manifest.json` from `template-manifest.json`, zips it with that arch's binaries and `adb.json` into `dist/<arch>/adb-extension-<version>-<arch>.xpi`, deletes the temporary manifest, then writes `dist/<arch>/update.json` from `template-update.json`. There is no lint/test suite for this half of the repo — it's packaging of vendored binaries, not application code.
 
 ### Key convention: per-arch version suffix
 
@@ -87,3 +87,5 @@ npm test                # runs test/run-test.js against a mocked Claude client �
 ```
 
 Running a single test: `test/run-test.js` is a plain Node script (not a test-framework runner), so there's no built-in filter flag — run `node test/run-test.js` directly and narrow by temporarily commenting out cases, or read the file to find its exported/invoked scenario names.
+
+Every dropped file triggers one real, billed Claude API call (content truncated to ~20k chars); there's no batching or caching, so testing changes against the live watcher (rather than the mocked `npm test` suite) has a real cost.
