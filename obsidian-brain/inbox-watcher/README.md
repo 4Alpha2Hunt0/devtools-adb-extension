@@ -52,8 +52,8 @@ Finder/Explorer, or by dragging them into that folder from Obsidian). Each
 one gets:
 
 1. **Extracted** — `.md`/`.txt`/`.csv`/`.json` read directly, `.pdf` via
-   `pdf-parse`, `.docx` via `mammoth`, images (`.png`/`.jpg`/`.webp`/`.gif`)
-   sent to Claude directly as an image.
+   `unpdf` (built on Mozilla's `pdfjs-dist`), `.docx` via `mammoth`, images
+   (`.png`/`.jpg`/`.webp`/`.gif`) sent to Claude directly as an image.
 2. **Classified** — Claude returns a title, a 2-4 sentence summary, tags,
    and a category (`tool` / `project` / `note`).
 3. **Filed** — a new note is written to the matching folder, and the
@@ -70,7 +70,7 @@ watcher to retry it.
 | Type | Extensions | How |
 |---|---|---|
 | Text | `.md`, `.txt`, `.csv`, `.json`, `.log` | read directly |
-| PDF | `.pdf` | text extracted via `pdf-parse` |
+| PDF | `.pdf` | text extracted via `unpdf` (`pdfjs-dist`) |
 | Word | `.docx` | text extracted via `mammoth` |
 | Images | `.png`, `.jpg`/`.jpeg`, `.webp`, `.gif` | sent to Claude as an image |
 | Anything else | — | read as UTF-8 text if it decodes cleanly, otherwise rejected |
